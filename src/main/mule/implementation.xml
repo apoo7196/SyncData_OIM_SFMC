@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="syncDataOIMtoSFMC" doc:id="6f61060e-8344-4e07-a028-e3b30702e94e" >
+		<scheduler doc:name="Scheduler" doc:id="f3451a31-dfc5-4840-9f32-991f4ea436c2" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="HOURS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<os:retrieve doc:name="Retrieve" doc:id="e44259ce-45e4-4957-9e62-71535aad36e5" key="lastRun"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="26025af2-dbdb-4c4a-aef8-c459dae94806" variableName="lastRun"/>
+		<http:request method="GET" doc:name="Request" doc:id="12687172-f8cb-4424-84ca-6cb42bcea097" config-ref="HTTPRequest_OIM" path="/accounts" responseTimeout="500000"/>
+		<foreach doc:name="For Each" doc:id="5264a1d1-0226-4331-88d5-f35ba21ee7dd" collection="#[payload]">
+			<choice doc:name="Choice" doc:id="8cb40cc6-b124-4db2-8eb1-007dad69d69b" >
+				<when expression='#[payload.lastUpdated as String{format: "YYYY-MM-DD HH:mm:ss"} &gt; vars.lastRun]'>
+					<http:request method="POST" doc:name="Request" doc:id="6665b1bc-3612-47e6-b999-05b599ca7eee" config-ref="HTTPRequest_SFMC" path="/employees" responseTimeout="500000"/>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="a6e66d7f-2b75-4ae1-a345-b8bea1f7cdd2" message="No new records"/>
+				</otherwise>
+			</choice>
+		</foreach>
+		<os:store doc:name="Store" doc:id="86137151-a9d8-4e41-96c4-59ad3c950957" key="lastRun">
+			<os:value ><![CDATA[#[now() as String{format: "YYYY-MM-dd HH:mm:ss"}]]]></os:value>
+		</os:store>
+	</flow>
+</mule>

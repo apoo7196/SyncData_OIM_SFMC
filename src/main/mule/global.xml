@@ -6,10 +6,16 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<http:request-config name="HTTPRequest_OIM" doc:name="HTTP Request configuration" doc:id="07b4f3e8-8d1c-409b-8e78-c3b99b0bc108" basePath="/api" >
 		<http:request-connection host="localhost" port="8081" >
+			<reconnection >
+				<reconnect frequency="300000" />
+			</reconnection>
 		</http:request-connection>
 	</http:request-config>
 	<http:request-config name="HTTPRequest_SFMC" doc:name="HTTP Request configuration" doc:id="883605ff-24bd-4cbf-a821-c688bea33669" basePath="/api" >
 		<http:request-connection host="localhost" port="8082" >
+			<reconnection >
+				<reconnect frequency="300000" />
+			</reconnection>
 		</http:request-connection>
 	</http:request-config>
 </mule>

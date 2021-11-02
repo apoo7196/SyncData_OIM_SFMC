@@ -15,15 +15,15 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<os:retrieve doc:name="Retrieve" doc:id="e44259ce-45e4-4957-9e62-71535aad36e5" key="lastRun"/>
 		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="26025af2-dbdb-4c4a-aef8-c459dae94806" variableName="lastRun"/>
 		<http:request method="GET" doc:name="Request" doc:id="12687172-f8cb-4424-84ca-6cb42bcea097" config-ref="HTTPRequest_OIM" path="/accounts" responseTimeout="500000"/>
-		<foreach doc:name="For Each" doc:id="5264a1d1-0226-4331-88d5-f35ba21ee7dd" collection="#[payload]">
-			<choice doc:name="Choice" doc:id="8cb40cc6-b124-4db2-8eb1-007dad69d69b" >
-				<when expression='#[payload.lastUpdated as String{format: "YYYY-MM-DD HH:mm:ss"} &gt; vars.lastRun]'>
-					<http:request method="POST" doc:name="Request" doc:id="6665b1bc-3612-47e6-b999-05b599ca7eee" config-ref="HTTPRequest_SFMC" path="/employees" responseTimeout="500000"/>
-				</when>
-				<otherwise >
-					<logger level="INFO" doc:name="Logger" doc:id="a6e66d7f-2b75-4ae1-a345-b8bea1f7cdd2" message="No new records"/>
-				</otherwise>
-			</choice>
+		<foreach doc:name="For Each" doc:id="bb0693e9-422a-4c34-8f53-5ccf9d1539f0" collection="#[payload]">
+			<choice doc:name="Choice" doc:id="eacd604c-2846-4e3a-a08f-d50c8abb8e22">
+			<when expression='#[payload.lastUpdated as String{format: "YYYY-MM-DD HH:mm:ss"} &gt; vars.lastRun]'>
+				<http:request method="POST" doc:name="Request" doc:id="6665b1bc-3612-47e6-b999-05b599ca7eee" config-ref="HTTPRequest_SFMC" path="/employees" responseTimeout="500000" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="6e6abdcb-55aa-427b-bbde-67e708633c72" message="No new records" />
+			</otherwise>
+		</choice>
 		</foreach>
 		<os:store doc:name="Store" doc:id="86137151-a9d8-4e41-96c4-59ad3c950957" key="lastRun">
 			<os:value ><![CDATA[#[now() as String{format: "YYYY-MM-dd HH:mm:ss"}]]]></os:value>
